@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Chatbot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background-image: url('https://www.w3schools.com/w3images/forestbridge.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: background 1s ease-in-out;
+        }
+
+        #header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-out;
+        }
+
+        #header h1 {
+            font-size: 36px;
+            color: #ff6347;
+            display: inline-block;
+            margin: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #header .balloon {
+            font-size: 60px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        #header .celebration-text {
+            color: #ff1493;
+            font-size: 28px;
+            margin-top: 10px;
+            font-weight: bold;
+            font-family: 'Cursive', sans-serif;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        #chat-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 380px;
+            height: 80%;
+            max-height: 500px;
+            overflow: hidden; /* hide outer overflow - internal scroll handled by chatbox */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            margin: 0 10px;
+        }
+
+        #chatbox {
+            flex-grow: 1;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 12px;
+        }
+
+        #user-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #user-input:focus {
+            background-color: #f1f1f1;
+            outline: none;
+        }
+
+        #send-button {
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #send-button:hover {
+            background-color: #e55347;
+        }
+
+        .user-message, .bot-message {
+            margin: 12px 0;
+            padding: 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #9affc4, #d9f7be);
+            text-align: right;
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .bot-message {
+            background: linear-gradient(135deg, #f8f8f8, #f1f1f1);
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading area (scrolling bar + text) */
+        .loading-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0;
+            padding: 8px 12px;
+        }
+
+        .loading-text {
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .loading-bar {
+            width: 160px;
+            height: 10px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.06) 50%);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .loading-bar::before {
+            content: "";
+            position: absolute;
+            left: -40%;
+            top: 0;
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, transparent, rgba(255,99,71,0.6), transparent);
+            animation: loading-slide 1s linear infinite;
+        }
+
+        @keyframes loading-slide {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            #header h1 {
+                font-size: 28px;
+            }
+
+            #header .balloon {
+                font-size: 50px;
+            }
+
+            #header .celebration-text {
+                font-size: 24px;
+            }
+
+            #chat-container {
+                width: 90%;
+                padding: 20px;
+                height: 70%;
+            }
+
+            #user-input {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            #send-button {
+                display: inline-block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #header h1 {
+                font-size: 24px;
+            }
+
+            #header .balloon {
+                font-size: 40px;
+            }
+
+            #header .celebration-text {
+                font-size: 18px;
+            }
+
+            #chat-container {
+                width: 95%;
+                padding: 15px;
+                height: 60%;
+            }
+
+            #user-input {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            #send-button {
+                display: inline-block;
+            }
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section with Balloon Emoji and Celebration Text -->
+    <div id="header">
+        <h1>Birthday Chatbot 🎉</h1>
+        <span class="balloon">🎈</span>
+        <div class="celebration-text">Let's celebrate your day! 🎂</div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chat-container">
+        <div id="chatbox"></div>
+
+        <!-- Loading indicator (hidden by default) -->
+        <!-- This element is created/removed by JS, but keeping a placeholder comment here -->
+        <input type="text" id="user-input" placeholder="Type here..." onkeyup="if(event.keyCode === 13) sendMessage();">
+        <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        Powered by DataXphere
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io.connect('http://localhost:8501');
+
+        // Keep track of the current loading element (if any)
+        let currentLoadingElement = null;
+
+        window.onload = function() {
+            addBotMessage("Hi! I am the Birthday Chatbot.");
+        };
+
+        function sendMessage() {
+            const userInputEl = document.getElementById('user-input');
+            const userInput = userInputEl.value.trim();
+            if (userInput !== '') {
+                addUserMessage(userInput);
+                userInputEl.value = '';
+                // Show loading indicator (scrolling bar + "Tame Lagega")
+                showLoading();
+                socket.emit('message', userInput);
+            }
+        }
+
+        socket.on('response', function(response) {
+            // remove loading when response arrives
+            hideLoading();
+            addBotMessage(response);
+        });
+
+        function addUserMessage(message) {
+            const chatbox = document.getElementById('chatbox');
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('user-message');
+            userMessage.innerText = `You: ${message}`;
+            chatbox.appendChild(userMessage);
+            // scroll to bottom
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function addBotMessage(message) {
+            const chatbox = document.getElementById('chatbox');
+            const botMessage = document.createElement('div');
+            botMessage.classList.add('bot-message');
+            botMessage.innerText = `Bot: ${message}`;
+            chatbox.appendChild(botMessage);
+            // scroll to bottom
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function showLoading() {
+            // If already showing, do nothing
+            if (currentLoadingElement) return;
+
+            const chatbox = document.getElementById('chatbox');
+
+            // wrapper to match bot message look-and-feel
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('bot-message');
+            wrapper.style.display = 'flex';
+            wrapper.style.flexDirection = 'column';
+            wrapper.style.alignItems = 'center';
+
+            const loadingWrapper = document.createElement('div');
+            loadingWrapper.classList.add('loading-wrapper');
+
+            const loadingText = document.createElement('div');
+            loadingText.classList.add('loading-text');
+            // Use the requested text "Tame Lagega"
+            loadingText.innerText = 'Bot: Tame Lagega';
+
+            const loadingBar = document.createElement('div');
+            loadingBar.classList.add('loading-bar');
+
+            loadingWrapper.appendChild(loadingText);
+            loadingWrapper.appendChild(loadingBar);
+            wrapper.appendChild(loadingWrapper);
+
+            chatbox.appendChild(wrapper);
+            currentLoadingElement = wrapper;
+            // scroll to bottom so user sees the loading element
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function hideLoading() {
+            if (!currentLoadingElement) return;
+            const chatbox = document.getElementById('chatbox');
+            try {
+                chatbox.removeChild(currentLoadingElement);
+            } catch (e) {
+                // ignore if already removed
+            }
+            currentLoadingElement = null;
+            // ensure scroll remains at bottom after removing
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
